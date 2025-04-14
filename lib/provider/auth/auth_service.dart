@@ -22,6 +22,41 @@ class AuthService {
         user.providerData.any((userInfo) => userInfo.providerId == 'password');
   }
 
+  // Email and Password Sign Up
+  Future<UserCredential> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    return await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  // Email and Password Sign In
+  Future<UserCredential> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    return await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  // Send Verification Email
+  Future<void> sendEmailVerification() async {
+    final user = _auth.currentUser;
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+    }
+  }
+
+  // Reset password
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
   // Google Sign In
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow

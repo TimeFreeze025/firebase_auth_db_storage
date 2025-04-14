@@ -1,12 +1,11 @@
-// lib/screens/login_screen.dart
 import 'package:firebase_auth_db_storage/provider/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class LoginScreen extends HookConsumerWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends HookConsumerWidget {
+  const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,17 +13,38 @@ class LoginScreen extends HookConsumerWidget {
     final isLoading = useState(false);
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final confirmPasswordController = useTextEditingController();
     final formKey = useMemoized(() => GlobalKey<FormState>());
 
-    Future<void> handleSignIn() async {
+    Future<void> handleSignUp() async {
       if (!formKey.currentState!.validate()) return;
+
+      if (passwordController.text.trim() !=
+          confirmPasswordController.text.trim()) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+        return;
+      }
 
       isLoading.value = true;
       try {
-        await authService.signInWithEmailAndPassword(
+        await authService.signUpWithEmailAndPassword(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
+        // Send Verification Email
+        await authService.sendEmailVerification();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Registration Successful! Please check your email for verification.',
+              ),
+            ),
+          );
+          context.go('/verification');
+        }
       } catch (e) {
         isLoading.value = false;
         if (context.mounted) {
@@ -37,7 +57,7 @@ class LoginScreen extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Register'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body:
@@ -50,7 +70,7 @@ class LoginScreen extends HookConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Text(
-                      'Welcome Back!',
+                      'Create an Account',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -94,76 +114,49 @@ class LoginScreen extends HookConsumerWidget {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your password';
                               }
+                              if (value.length < 6) {
+                                return 'Password must be at least 6 characters long';
+                              }
                               return null;
                             },
                           ),
-                          const SizedBox(height: 24),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed:
-                                  () => context.push(
-                                    '/forgot-password',
-                                  ), // Corrected to push
-                              child: const Text('Forgot Password?'),
+                          SizedBox(height: 16),
+                          TextFormField(
+                            controller: confirmPasswordController,
+                            decoration: const InputDecoration(
+                              labelText: 'Confirm Password',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.lock_outline),
                             ),
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please confirm your password';
+                              }
+                              if (value != passwordController.text.trim()) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 24),
                           ElevatedButton(
-                            onPressed: handleSignIn,
+                            onPressed: handleSignUp,
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               minimumSize: const Size(double.infinity, 48),
                             ),
                             child: const Text(
-                              'Login',
+                              'Register',
                               style: TextStyle(fontSize: 16),
                             ),
                           ),
                           const SizedBox(height: 16),
                           TextButton(
-                            onPressed:
-                                () => context.push(
-                                  '/signup',
-                                ), // Corrected to push
-                            child: const Text(
-                              'Don\'t have an account? Register',
-                            ),
+                            onPressed: () => context.go('/login'),
+                            child: Text('Already have an account? Log in'),
                           ),
                         ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    const Row(
-                      children: [
-                        Expanded(child: Divider()),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text('OR'),
-                        ),
-                        Expanded(child: Divider()),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    OutlinedButton.icon(
-                      onPressed: () async {
-                        isLoading.value = true;
-                        try {
-                          await authService.signInWithGoogle();
-                          // Router will handle navigation
-                        } catch (e) {
-                          isLoading.value = false;
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: ${e.toString()}')),
-                            );
-                          }
-                        }
-                      },
-                      icon: const Icon(Icons.login),
-                      label: const Text('Sign in with Google'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ],

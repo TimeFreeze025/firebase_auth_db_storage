@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:firebase_auth_db_storage/provider/auth/auth_provider.dart';
 import 'package:firebase_auth_db_storage/screens/auth/login_screen.dart';
+import 'package:firebase_auth_db_storage/screens/auth/signup_screen.dart';
+import 'package:firebase_auth_db_storage/screens/auth/verification_screen.dart';
 import 'package:firebase_auth_db_storage/screens/home_screen.dart';
 import 'package:firebase_auth_db_storage/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authStateStream = ref.watch(authStateProvider.stream);
   final authService = ref.watch(authServiceProvider);
-  final needsVerification = authService.needsEmailVerification();
 
   return GoRouter(
     initialLocation: '/splash',
@@ -18,19 +19,25 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/splash', builder: (context, state) => SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
-      // GoRoute(path: '/signup', builder: (context, state) => SignUpScreen()),
+      GoRoute(path: '/signup', builder: (context, state) => SignUpScreen()),
       // GoRoute(path: '/forgot-password', builder: (context, state) => ForgotPasswordScreen()),
-      // GoRoute(path: '/verification', builder: (context, state) => EmailVerificationScreen()),
+      GoRoute(
+        path: '/verification',
+        builder: (context, state) => EmailVerificationScreen(),
+      ),
       GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
     ],
     redirect: (context, state) {
       final isAuthenticated = ref.read(authStateProvider).valueOrNull != null;
       final isAuthenticating = ref.read(authStateProvider).isLoading;
       final currentLocation = state.uri.toString();
+      final needsVerification = authService.needsEmailVerification();
 
       if (isAuthenticating) {
         return currentLocation == '/splash' ? null : '/splash';
       }
+
+      print(needsVerification);
 
       final isAuthRoute =
           currentLocation == '/login' ||
