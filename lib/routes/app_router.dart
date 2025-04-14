@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth_db_storage/provider/auth/auth_provider.dart';
+import 'package:firebase_auth_db_storage/screens/auth/forgot_password_screen.dart';
 import 'package:firebase_auth_db_storage/screens/auth/login_screen.dart';
 import 'package:firebase_auth_db_storage/screens/auth/signup_screen.dart';
 import 'package:firebase_auth_db_storage/screens/auth/verification_screen.dart';
@@ -20,7 +21,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (context, state) => SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
       GoRoute(path: '/signup', builder: (context, state) => SignUpScreen()),
-      // GoRoute(path: '/forgot-password', builder: (context, state) => ForgotPasswordScreen()),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => ForgotPasswordScreen(),
+      ),
       GoRoute(
         path: '/verification',
         builder: (context, state) => EmailVerificationScreen(),
