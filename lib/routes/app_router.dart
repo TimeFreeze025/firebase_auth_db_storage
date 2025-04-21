@@ -13,6 +13,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authStateStream = ref.watch(authStateProvider.stream);
   final authService = ref.watch(authServiceProvider);
+  final splashAsync = ref.watch(splashDelayProvider);
 
   return GoRouter(
     initialLocation: '/splash',
@@ -32,16 +33,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
     ],
     redirect: (context, state) {
+      if (splashAsync.isLoading) return null;
+
       final isAuthenticated = ref.read(authStateProvider).valueOrNull != null;
       final isAuthenticating = ref.read(authStateProvider).isLoading;
-      final currentLocation = state.uri.toString();
       final needsVerification = authService.needsEmailVerification();
+      final currentLocation = state.uri.toString();
 
       if (isAuthenticating) {
         return currentLocation == '/splash' ? null : '/splash';
       }
-
-      print(needsVerification);
 
       final isAuthRoute =
           currentLocation == '/login' ||
@@ -78,3 +79,7 @@ class GoRouterRefreshStreamNotifier extends ChangeNotifier {
     super.dispose();
   }
 }
+
+final splashDelayProvider = FutureProvider<void>((ref) async {
+  await Future.delayed(const Duration(seconds: 3));
+});
