@@ -34,7 +34,7 @@ class AddImageDialog extends HookConsumerWidget {
 
           final imageUrl = await container
               .read(storageServiceProvider)
-              .uploadImage(XFile(selectedImage.path));
+              .uploadImageToStorage(XFile(selectedImage.path));
 
           if (imageUrl != null) {
             await container
@@ -121,46 +121,46 @@ class AddImageDialog extends HookConsumerWidget {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            if (context.mounted) {
-                              context.pop();
-                            }
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.grey,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                          ),
-                          child: Text('Cancel'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            handleAddImage();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: Text('Submit'),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                    ),
+                    child: Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      handleAddImage();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text('Submit'),
+                  ),
+                ],
               ),
             ],
           ),

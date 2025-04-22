@@ -96,7 +96,19 @@ class HomeScreen extends HookConsumerWidget {
               final title = doc['title'] as String? ?? "";
               final description = doc['description'] as String? ?? "";
               return InkWell(
-                onTap: () {},
+                onTap: () {
+                  if (context.mounted) {
+                    context.push(
+                      '/image-detail',
+                      extra: {
+                        'docId': doc.id,
+                        'imageUrl': imageUrl,
+                        'title': title,
+                        'description': description,
+                      },
+                    );
+                  }
+                },
                 child: Card(
                   clipBehavior: Clip.antiAlias,
                   child: Column(

@@ -13,3 +13,5 @@ App with Firebase Auth, Firebase Database, and Firebase Storage
 - [x] Firestore Database Implementation
 - [x] Firebase Storage Implementation
 - [x] Implemented Add Image and Data to Firebase
+- [x] Implemented Delete Image and Data to Firebase
+- [x] Implemented Update Image and/or Data to Firebase

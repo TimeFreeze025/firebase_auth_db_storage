@@ -5,6 +5,7 @@ import 'package:firebase_auth_db_storage/screens/auth/login_screen.dart';
 import 'package:firebase_auth_db_storage/screens/auth/signup_screen.dart';
 import 'package:firebase_auth_db_storage/screens/auth/verification_screen.dart';
 import 'package:firebase_auth_db_storage/screens/home_screen.dart';
+import 'package:firebase_auth_db_storage/screens/image_detail_screen.dart';
 import 'package:firebase_auth_db_storage/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -31,6 +32,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => EmailVerificationScreen(),
       ),
       GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
+      GoRoute(
+        path: '/image-detail',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+
+          return ImageDetailScreen(
+            docId: extra['docId'],
+            imageUrl: extra['imageUrl'],
+            title: extra['title'],
+            description: extra['description'],
+          );
+        },
+      ),
     ],
     redirect: (context, state) {
       if (splashAsync.isLoading) return null;
@@ -49,11 +63,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           currentLocation == '/signup' ||
           currentLocation == '/forgot-password';
 
+      final isLoggedRoute =
+          currentLocation == '/home' || currentLocation == '/image-detail';
+
       if (isAuthenticated) {
         if (needsVerification) {
           return currentLocation == '/verification' ? null : '/verification';
         } else {
-          return currentLocation == '/home' ? null : '/home';
+          return isLoggedRoute ? null : '/home';
         }
       } else {
         return isAuthRoute ? null : '/login';

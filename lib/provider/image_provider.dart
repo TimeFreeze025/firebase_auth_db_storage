@@ -28,4 +28,26 @@ class ImageNotifier extends Notifier<void> {
       description,
     );
   }
+
+  Future<void> deleteImage({
+    required String docId,
+    required String imageUrl,
+  }) async {
+    await _storageService.deleteImage(docId: docId, imageUrl: imageUrl);
+  }
+
+  Future<void> updateImage(
+    String? newImageUrl,
+    String description, {
+    required String docId,
+    required String title,
+    required,
+  }) async {
+    await _storageService.updateImageToFirestore(
+      newImageUrl,
+      description,
+      docId: docId,
+      title: title,
+    );
+  }
 }

@@ -15,7 +15,7 @@ class StorageService {
   final String _storageFolder = "imageStorage";
   final String _collectionName = "imageDb";
 
-  Future<String?> uploadImage(XFile image) async {
+  Future<String?> uploadImageToStorage(XFile image) async {
     try {
       final String fileName = DateTime.now().microsecondsSinceEpoch.toString();
       final Reference storageRef = _storage.ref().child(
@@ -44,6 +44,43 @@ class StorageService {
         'description': description,
         'createdAt': FieldValue.serverTimestamp(),
       });
+    } catch (e) {}
+  }
+
+  Future<void> deleteImage({
+    required String docId,
+    required String imageUrl,
+  }) async {
+    try {
+      await _storage.refFromURL(imageUrl).delete();
+      await _firestore.collection(_collectionName).doc(docId).delete();
+    } catch (e) {}
+  }
+
+  Future<void> deleteImageFromStorage({required String imageUrl}) async {
+    try {
+      await _storage.refFromURL(imageUrl).delete();
+    } catch (e) {}
+  }
+
+  Future<void> updateImageToFirestore(
+    String? newImageUrl,
+    String description, {
+    required docId,
+    required String title,
+  }) async {
+    try {
+      Map<String, dynamic> updatedData = {
+        'title': title,
+        'description': description,
+      };
+      if (newImageUrl != null) {
+        updatedData['imageUrl'] = newImageUrl;
+      }
+      await _firestore
+          .collection(_collectionName)
+          .doc(docId)
+          .update(updatedData);
     } catch (e) {}
   }
 }
